@@ -14,7 +14,7 @@ export const updateCurrentUser = mutation({
       .unique();
 
     if (existing) {
-      await ctx.db.patch(existing._id, { name: identity.name, email: identity.email });
+      await ctx.db.patch(existing._id, { email: identity.email });
       return existing._id;
     }
 
@@ -52,6 +52,11 @@ export const updateProfile = mutation({
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
       .unique();
     if (!user) throw new ConvexError({ message: "User not found", code: "NOT_FOUND" });
-    await ctx.db.patch(user._id, { name: args.name });
+    if (!args.name.trim() || args.name.length > 100)
+      throw new ConvexError({
+        code: "INVALID_INPUT",
+        message: "Enter a name of 1 to 100 characters.",
+      });
+    await ctx.db.patch(user._id, { name: args.name.trim() });
   },
 });

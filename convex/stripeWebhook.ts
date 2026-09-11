@@ -6,21 +6,23 @@ import { internal } from "./_generated/api";
 import { v } from "convex/values";
 
 function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-06-24.dahlia",
-  });
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 }
 
 export const handleStripeEvent = internalAction({
   args: { body: v.string(), sig: v.string() },
   handler: async (ctx, args): Promise<null> => {
+    throw new Error("Payments are disabled during controlled testing.");
     const stripe = getStripe();
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(args.body, args.sig, process.env.STRIPE_WEBHOOK_SECRET!);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
-      throw new Error(`Webhook verification failed: ${message}`);
+      event = stripe.webhooks.constructEvent(
+        args.body,
+        args.sig,
+        process.env.STRIPE_WEBHOOK_SECRET!,
+      );
+    } catch {
+      throw new Error("Webhook verification failed");
     }
 
     switch (event.type) {
@@ -43,7 +45,9 @@ export const handleStripeEvent = internalAction({
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice & { subscription?: string };
         if (invoice.subscription) {
-          await ctx.runMutation(internal.paymentsDb.deactivatePro, { stripeSubscriptionId: invoice.subscription });
+          await ctx.runMutation(internal.paymentsDb.deactivatePro, {
+            stripeSubscriptionId: invoice.subscription!,
+          });
         }
         break;
       }

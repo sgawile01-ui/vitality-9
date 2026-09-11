@@ -1,5 +1,5 @@
 {
   "node": {
-    "externalPackages": ["stripe"]
+    "externalPackages": []
   }
 }

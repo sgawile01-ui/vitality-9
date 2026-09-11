@@ -2,6 +2,11 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  coachLimits: defineTable({
+    userId: v.id("users"),
+    windowStart: v.number(),
+    count: v.number(),
+  }).index("by_user", ["userId"]),
   users: defineTable({
     tokenIdentifier: v.string(),
     name: v.optional(v.string()),

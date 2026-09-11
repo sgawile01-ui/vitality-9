@@ -7,9 +7,11 @@ import { internal } from "./_generated/api";
 import { ConvexError } from "convex/values";
 
 function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-06-24.dahlia",
+  throw new ConvexError({
+    code: "PAYMENTS_DISABLED",
+    message: "Payments are disabled during controlled testing.",
   });
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {});
 }
 
 export const createProCheckoutSession = action({
@@ -47,18 +49,20 @@ export const createProCheckoutSession = action({
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
-      line_items: [{
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "Vitality 9 Pro",
-            description: "Unlimited journeys + AI Health Coaching powered by Gemini",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Vitality 9 Pro",
+              description: "Unlimited journeys + AI Health Coaching powered by Gemini",
+            },
+            unit_amount: 499,
+            recurring: { interval: "month" },
           },
-          unit_amount: 499,
-          recurring: { interval: "month" },
+          quantity: 1,
         },
-        quantity: 1,
-      }],
+      ],
       success_url: args.successUrl,
       cancel_url: args.cancelUrl,
       allow_promotion_codes: true,
@@ -79,7 +83,8 @@ export const createBillingPortalSession = action({
       tokenIdentifier: identity.tokenIdentifier,
     });
 
-    if (!user?.stripeCustomerId) throw new ConvexError({ message: "No billing account found", code: "NOT_FOUND" });
+    if (!user?.stripeCustomerId)
+      throw new ConvexError({ message: "No billing account found", code: "NOT_FOUND" });
 
     const stripe = getStripe();
     const session = await stripe.billingPortal.sessions.create({
