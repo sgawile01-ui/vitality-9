@@ -53,6 +53,7 @@ function InfoRow({
 
 function ProfileInner() {
   const user = useQuery(api.users.getCurrentUser, {});
+  const billing = useQuery(api.billing.status);
   const updateProfile = useMutation(api.users.updateProfile);
   const createCheckout = useAction(api.payments.createProCheckoutSession);
   const createPortal = useAction(api.payments.createBillingPortalSession);
@@ -62,6 +63,7 @@ function ProfileInner() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutRequestId] = useState(() => crypto.randomUUID());
   const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
@@ -100,6 +102,7 @@ function ProfileInner() {
     setCheckoutLoading(true);
     try {
       const { url } = await createCheckout({
+        requestId: checkoutRequestId,
         successUrl: `${window.location.origin}/?pro=success`,
         cancelUrl: `${window.location.origin}/profile`,
       });
@@ -228,18 +231,24 @@ function ProfileInner() {
               </li>
             ))}
           </ul>
-          <Button className="w-full" onClick={handleUpgrade} disabled={true}>
+          <Button
+            className="w-full"
+            onClick={handleUpgrade}
+            disabled={!billing?.testOnly || checkoutLoading}
+          >
             {checkoutLoading ? (
               "Redirecting..."
             ) : (
               <>
                 <SparklesIcon size={15} />
-                Get Pro – $4.99/mo
+                {billing?.testOnly ? "Try test checkout — no real charge" : "Get Pro – $4.99/mo"}
               </>
             )}
           </Button>
           <p className="text-center text-xs text-muted-foreground mt-2">
-            Payments are disabled during controlled testing.
+            {billing?.testOnly
+              ? "Sandbox checkout. Use Stripe test payment details only."
+              : "Payments are disabled during controlled testing."}
           </p>
         </motion.div>
       )}
@@ -261,7 +270,7 @@ function ProfileInner() {
             variant="secondary"
             className="w-full"
             onClick={handleManageBilling}
-            disabled={true}
+            disabled={!billing?.testOnly || portalLoading || !user?.stripeCustomerId}
           >
             {portalLoading ? (
               "Opening portal..."

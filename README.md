@@ -2,6 +2,10 @@
 
 A nine-day wellness journey with nine pillars, 81 gentle activities, per-user progress and a Pro-gated AI wellness coach. General education only; not diagnosis, emergency care or a replacement for professional medical care. Founder: Dr. Steven Gawile.
 
+## Open the local testing app
+
+Double-click **Start Vitality 9 Testing.cmd**, or run `npm run start:testing`, then open <http://127.0.0.1:5175/testing/index.html>. This separate testing entry point uses a synthetic account and the real local backend for saved progress. Coach replies are clearly labelled offline practice responses when Gemini is not configured. Payments are disabled. See [local testing instructions](docs/LOCAL_TESTING.md).
+
 This branch is for controlled synthetic-data testing. Payments are disabled. The Founder authorized committing and pushing this readiness branch. Merging, production deployment, infrastructure changes and live-payment activation require separate approval.
 
 ## Install and run
@@ -78,3 +82,7 @@ Stop running Vite/Playwright processes before `npm ci` on Windows to avoid locke
 - [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 Mocked tests validate deterministic behavior and application wiring. They do not demonstrate live-provider reliability, clinical safety or readiness for real users. Founder approval is required before pushing, merging, deploying, changing production infrastructure or enabling payments.
+
+## Controlled beta preparation (2026-09-13)
+
+See [controlled beta deployment](docs/CONTROLLED_BETA.md) for the production configuration, invitation-only gate, sandbox billing setup and required live checks. This preparation has not launched a beta. Local code now supports Stripe test payments only; live keys/events remain rejected. Vite configuration reads injected process settings instead of auto-loading `.env` files. The local testing launcher allowlists `founder-testing` and `synthetic-local-check` only on the anonymous local backend; it no longer sets `BETA_MODE=local`.

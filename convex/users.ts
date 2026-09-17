@@ -1,3 +1,4 @@
+import { requireBetaAccess } from "./lib/betaAccess";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -7,6 +8,7 @@ export const updateCurrentUser = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
+    requireBetaAccess(identity);
 
     const existing = await ctx.db
       .query("users")
@@ -35,6 +37,7 @@ export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
+    requireBetaAccess(identity);
     return await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
@@ -47,6 +50,7 @@ export const updateProfile = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    requireBetaAccess(identity);
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))

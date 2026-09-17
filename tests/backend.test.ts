@@ -52,20 +52,18 @@ it("Pro normal dialogue calls mocked Gemini through actual action", async () => 
   vi.stubEnv("GOOGLE_API_KEY", "synthetic-placeholder");
   vi.stubGlobal(
     "fetch",
-    vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            candidates: [
-              {
-                finishReason: "STOP",
-                content: { parts: [{ text: "For Sleep, try a quiet evening routine." }] },
-              },
-            ],
-          }),
-        ),
+    vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              finishReason: "STOP",
+              content: { parts: [{ text: "For Sleep, try a quiet evening routine." }] },
+            },
+          ],
+        }),
       ),
+    ),
   );
   expect(
     (await user.action(api.aiCoach.chat, { message: "Better sleep please", history: [] })).reply,
@@ -137,6 +135,7 @@ it("payments and webhook cannot call Stripe", async () => {
   vi.stubGlobal("fetch", fetcher);
   await expect(
     user.action(api.payments.createProCheckoutSession, {
+      requestId: "synthetic-request",
       successUrl: "https://synthetic.invalid",
       cancelUrl: "https://synthetic.invalid",
     }),

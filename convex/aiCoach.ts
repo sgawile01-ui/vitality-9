@@ -1,4 +1,5 @@
 "use node";
+import { requireBetaAccess } from "./lib/betaAccess";
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -14,6 +15,7 @@ export const chat = action({
   handler: async (ctx, args): Promise<{ reply: string; responseClass: string }> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) fail("UNAUTHENTICATED");
+    requireBetaAccess(identity);
     const user = await ctx.runQuery(internal.paymentsDb.getUserForPayment, {
       tokenIdentifier: identity.tokenIdentifier,
     });

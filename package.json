@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "npm run typecheck && vite build",
+    "build:vercel": "node scripts/check-production.mjs && npm run build",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
@@ -21,7 +22,9 @@
     "convex:dev": "node scripts/convex-local.mjs",
     "convex:codegen:offline": "convex codegen --system-udfs --typecheck disable",
     "scan:secrets": "node scripts/secret-scan.mjs",
-    "test:local": "node scripts/test-local.mjs"
+    "test:local": "node scripts/test-local.mjs",
+    "start:testing": "node scripts/start-testing.mjs",
+    "test:testing": "playwright test --config testing/playwright.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.16",

@@ -26,7 +26,12 @@ export function geminiProvider(
               headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
               body: JSON.stringify({
                 ...request,
-                generationConfig: { temperature: 0.3, maxOutputTokens: 800 },
+                systemInstruction: { parts: [{ text: request.systemInstruction }] },
+                generationConfig: {
+                  temperature: 0.3,
+                  maxOutputTokens: 2000,
+                  thinkingConfig: { thinkingLevel: "low" },
+                },
                 safetySettings: [
                   "HARM_CATEGORY_HARASSMENT",
                   "HARM_CATEGORY_HATE_SPEECH",

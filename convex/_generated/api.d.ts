@@ -9,11 +9,15 @@
  */
 
 import type * as aiCoach from "../aiCoach.js";
+import type * as beta from "../beta.js";
+import type * as billing from "../billing.js";
 import type * as challengeData from "../challengeData.js";
 import type * as coachLimits from "../coachLimits.js";
 import type * as http from "../http.js";
+import type * as lib_betaAccess from "../lib/betaAccess.js";
 import type * as lib_coach from "../lib/coach.js";
 import type * as lib_gemini from "../lib/gemini.js";
+import type * as lib_paymentConfig from "../lib/paymentConfig.js";
 import type * as payments from "../payments.js";
 import type * as paymentsDb from "../paymentsDb.js";
 import type * as stripeWebhook from "../stripeWebhook.js";
@@ -28,11 +32,15 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   aiCoach: typeof aiCoach;
+  beta: typeof beta;
+  billing: typeof billing;
   challengeData: typeof challengeData;
   coachLimits: typeof coachLimits;
   http: typeof http;
+  "lib/betaAccess": typeof lib_betaAccess;
   "lib/coach": typeof lib_coach;
   "lib/gemini": typeof lib_gemini;
+  "lib/paymentConfig": typeof lib_paymentConfig;
   payments: typeof payments;
   paymentsDb: typeof paymentsDb;
   stripeWebhook: typeof stripeWebhook;

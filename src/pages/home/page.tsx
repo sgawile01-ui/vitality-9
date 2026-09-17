@@ -307,7 +307,7 @@ function HomeInner() {
             </p>
             <p className="text-xs text-muted-foreground">
               {user?.isPro
-                ? "Ask Gemini anything about your wellness"
+                ? "Explore everyday wellness habits"
                 : "Pro feature — upgrade to unlock"}
             </p>
           </div>

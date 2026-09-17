@@ -21,7 +21,7 @@ export default function AiCoachChat({ onClose }: { onClose: () => void }) {
     {
       id: "welcome",
       role: "model",
-      text: "Hello! I'm your Vitality 9 AI Wellness Coach. I'm here to support your 9-pillar wellness journey with evidence-based guidance. What would you like to explore today?",
+      text: "Hello! I'm your Vitality 9 AI Wellness Coach. I'm here to support your 9-pillar wellness journey with general wellness education. What would you like to explore today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -92,7 +92,7 @@ export default function AiCoachChat({ onClose }: { onClose: () => void }) {
           </div>
           <div>
             <p className="text-sm font-bold text-foreground leading-none">AI Wellness Coach</p>
-            <p className="text-[10px] text-primary font-medium mt-0.5">Powered by Gemini · Pro</p>
+            <p className="text-[10px] text-primary font-medium mt-0.5">General wellness · Pro</p>
           </div>
         </div>
         <button
@@ -126,7 +126,7 @@ export default function AiCoachChat({ onClose }: { onClose: () => void }) {
               )}
               <div
                 className={cn(
-                  "max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap",
+                  "max-w-[80%] break-words px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap",
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground rounded-br-sm"
                     : "bg-muted text-foreground rounded-bl-sm",
@@ -194,6 +194,10 @@ export default function AiCoachChat({ onClose }: { onClose: () => void }) {
         <div ref={bottomRef} />
       </div>
       <div className="px-3 py-3 border-t border-border shrink-0">
+        <p className="text-xs text-muted-foreground mb-2">
+          Messages may be sent to Google Gemini. Use synthetic scenarios during beta; do not enter
+          patient records or identifying health information.
+        </p>
         <div className="flex items-end gap-2 bg-muted rounded-2xl px-3 py-2">
           <textarea
             aria-label="Message to wellness coach"

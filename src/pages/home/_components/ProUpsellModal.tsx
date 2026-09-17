@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button.tsx";
 import { SparklesIcon, XIcon, CheckIcon } from "lucide-react";
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api.js";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
@@ -14,12 +14,15 @@ export default function ProUpsellModal({ onClose }: { onClose: () => void }) {
     return () => dialog?.close();
   }, []);
   const createCheckout = useAction(api.payments.createProCheckoutSession);
+  const billing = useQuery(api.billing.status);
   const [loading, setLoading] = useState(false);
+  const [checkoutRequestId] = useState(() => crypto.randomUUID());
 
   const handleUpgrade = async () => {
     setLoading(true);
     try {
       const { url } = await createCheckout({
+        requestId: checkoutRequestId,
         successUrl: `${window.location.origin}/?pro=success`,
         cancelUrl: `${window.location.origin}/`,
       });
@@ -81,18 +84,25 @@ export default function ProUpsellModal({ onClose }: { onClose: () => void }) {
             </li>
           ))}
         </ul>
-        <Button className="w-full" size="lg" onClick={handleUpgrade} disabled={true}>
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={handleUpgrade}
+          disabled={!billing?.testOnly || loading}
+        >
           {loading ? (
             "Redirecting to checkout..."
           ) : (
             <>
               <SparklesIcon size={16} />
-              Get Pro – $4.99/mo
+              {billing?.testOnly ? "Try test checkout — no real charge" : "Get Pro – $4.99/mo"}
             </>
           )}
         </Button>
         <p className="text-center text-xs text-muted-foreground mt-2">
-          Payments are disabled during controlled testing.
+          {billing?.testOnly
+            ? "Sandbox checkout. Use Stripe test payment details only."
+            : "Payments are disabled during controlled testing."}
         </p>
       </motion.div>
     </dialog>

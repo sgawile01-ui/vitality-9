@@ -66,21 +66,21 @@ it("does not consume raw HTTP error bodies", async () => {
   expect(body).not.toHaveBeenCalled();
 });
 it("sends key in header, server policy separately; combines valid parts", async () => {
-  const fetcher = vi
-    .fn()
-    .mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          candidates: [
-            { finishReason: "STOP", content: { parts: [{ text: "One." }, { text: "Two." }] } },
-          ],
-        }),
-      ),
-    );
+  const fetcher = vi.fn().mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        candidates: [
+          { finishReason: "STOP", content: { parts: [{ text: "One." }, { text: "Two." }] } },
+        ],
+      }),
+    ),
+  );
   expect(await geminiProvider({ apiKey: "synthetic-placeholder", fetcher })(request)).toBe(
     "One.\nTwo.",
   );
   expect(fetcher.mock.calls[0][0]).not.toContain("synthetic-placeholder");
   expect(fetcher.mock.calls[0][1].headers["x-goog-api-key"]).toBe("synthetic-placeholder");
-  expect(JSON.parse(fetcher.mock.calls[0][1].body).systemInstruction).toBe(SYSTEM_POLICY);
+  expect(JSON.parse(fetcher.mock.calls[0][1].body).systemInstruction).toEqual({
+    parts: [{ text: SYSTEM_POLICY }],
+  });
 });

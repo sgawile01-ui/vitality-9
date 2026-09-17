@@ -2,6 +2,10 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  stripeEvents: defineTable({
+    eventId: v.string(),
+    processedAt: v.number(),
+  }).index("by_event", ["eventId"]),
   coachLimits: defineTable({
     userId: v.id("users"),
     windowStart: v.number(),
@@ -15,6 +19,7 @@ export default defineSchema({
     isPro: v.boolean(),
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
+    stripeEventCreated: v.optional(v.number()),
     currentChallengeDay: v.number(),
     challengeStartedAt: v.optional(v.string()),
   })
