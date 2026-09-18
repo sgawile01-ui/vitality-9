@@ -171,5 +171,26 @@ Hosted authentication checks remain pending. The existing Hercules app's
 successful SSO navigation is not validation of the changed repository or a
 synthetic two-user isolation test. No authentication-gate pass is claimed.
 
+### Development backend synchronized
+
+After the founder completed CLI authorization, the required authority and client
+ID were applied to the existing development deployment using captured session
+configuration. Values were not printed by the configuration commands or added
+to Git. `convex dev --once` synchronized the functions and seven indexes
+successfully with no authentication-configuration error.
+
+The admin-only readiness check confirmed authentication configured, restricted
+beta enabled, no invited testers yet, Gemini disabled, sandbox and live payments
+disabled, and no billing webhook or price configured. Direct anonymous cloud
+checks returned denied beta access, null profile and empty task data; an attempted
+profile update was rejected as unauthenticated.
+
+The frontend also built successfully using the actual configuration injected
+privately into the build process. A `.vercelignore` explicitly excludes local
+environment files, the local Convex directory and test artifacts from uploads.
+The Vercel CLI requires its own login despite the dashboard session being signed
+in. No frontend preview has been deployed yet, so every genuine hosted session
+check remains pending. Gemini and all payment functions remain disabled.
+
 References: [Convex custom OIDC](https://docs.convex.dev/auth/advanced/custom-auth),
 [Hercules authentication troubleshooting](https://hercules.app/docs/apps/users-auth/debug-auth).
