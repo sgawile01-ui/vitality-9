@@ -7,6 +7,8 @@ import Progress from "./pages/progress/page.tsx";
 import Profile from "./pages/profile/page.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { BetaGate } from "./components/BetaGate";
+// Ephemeral setup page — remove once BETA_ALLOWED_SUBJECTS is configured.
+import IdentityView from "./pages/beta/IdentityView.tsx";
 
 export default function App() {
   if (
@@ -34,17 +36,28 @@ export default function App() {
   return (
     <DefaultProviders>
       <BrowserRouter>
-        <BetaGate>
-          <Routes>
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/progress" element={<Progress />} />
-              <Route path="/profile" element={<Profile />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BetaGate>
+        {/* Ephemeral setup route — outside BetaGate so unapproved signed-in
+            users can still retrieve their subject for allowlist configuration.
+            Remove once BETA_ALLOWED_SUBJECTS is populated. */}
+        <Routes>
+          <Route path="/beta/identity" element={<IdentityView />} />
+          <Route
+            path="*"
+            element={
+              <BetaGate>
+                <Routes>
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  <Route element={<AppLayout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/progress" element={<Progress />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BetaGate>
+            }
+          />
+        </Routes>
       </BrowserRouter>
     </DefaultProviders>
   );
