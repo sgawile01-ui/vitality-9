@@ -3,6 +3,7 @@ import base from "../vite.config.ts";
 import { fileURLToPath, URL } from "node:url";
 import { allowed, callLocal, prepare } from "./backend";
 import { createReadiness } from "./readiness";
+import { assertLocalTestingRuntime, isDirectLoopbackRequest } from "./isolation";
 const origin = "http://127.0.0.1:5175";
 function testingApi(): Plugin {
   const readiness = createReadiness(prepare, async () => {
@@ -11,10 +12,18 @@ function testingApi(): Plugin {
   });
   return {
     name: "local-synthetic-testing",
-    apply: "serve",
+    configResolved(config) {
+      assertLocalTestingRuntime();
+      if (config.command !== "serve" || config.isProduction || config.server.host !== "127.0.0.1")
+        throw new Error("LOCAL_TESTING_ONLY");
+    },
     configureServer(server) {
       void readiness.check(); // Errors are sanitized; later requests retry initialization.
       server.middlewares.use(async (req, res, next) => {
+        if (!isDirectLoopbackRequest(req)) {
+          res.statusCode = 403;
+          return res.end("LOCAL_TESTING_ONLY");
+        }
         if (!req.url?.startsWith("/_testing/")) return next();
         res.setHeader("Content-Type", "application/json");
         res.setHeader("Cache-Control", "no-store");

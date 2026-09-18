@@ -9,7 +9,10 @@ export default defineConfig({
     ],
   },
   test: {
-    env: { BETA_MODE: "local" },
+    // Synthetic identities exist only inside convex-test, never in the app bundle.
+    env: {
+      BETA_ALLOWED_SUBJECTS: "synthetic-a,synthetic-b,synthetic-billing,synthetic-invite",
+    },
     environment: "edge-runtime",
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
     server: { deps: { inline: ["convex-test"] } },

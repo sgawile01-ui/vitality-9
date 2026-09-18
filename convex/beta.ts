@@ -1,12 +1,12 @@
 import { query, internalQuery } from "./_generated/server";
-import { hasBetaAccess, localBetaBypassAllowed } from "./lib/betaAccess";
+import { hasBetaAccess } from "./lib/betaAccess";
 
 export const access = query({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     return {
-      restricted: !localBetaBypassAllowed(),
+      restricted: true,
       allowed: identity ? hasBetaAccess(identity) : false,
     };
   },
@@ -19,7 +19,7 @@ export const readiness = internalQuery({
     authentication: Boolean(
       process.env.HERCULES_OIDC_AUTHORITY && process.env.HERCULES_OIDC_CLIENT_ID,
     ),
-    restrictedBeta: !localBetaBypassAllowed(),
+    restrictedBeta: true,
     invitedTesters: Boolean(process.env.BETA_ALLOWED_SUBJECTS?.trim()),
     ai: Boolean(process.env.GOOGLE_API_KEY),
     sandboxPayments:

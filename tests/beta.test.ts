@@ -114,7 +114,7 @@ it.each([
     }),
   ).rejects.toThrow(/BETA_RESTRICTED/);
 });
-it("unknown runtime fails closed, while confirmed local runtime and production invite work", async () => {
+it("unknown and local runtimes fail closed; only explicit invitations work", async () => {
   for (const name of [
     "NODE_ENV",
     "VERCEL_ENV",
@@ -129,7 +129,7 @@ it("unknown runtime fails closed, while confirmed local runtime and production i
   const user = t.withIdentity({ subject: "synthetic-invited" });
   expect((await user.query(api.beta.access, {})).allowed).toBe(false);
   vi.stubEnv("CONVEX_CLOUD_URL", "http://127.0.0.1:3210");
-  expect(await user.query(api.beta.access, {})).toEqual({ restricted: false, allowed: true });
+  expect(await user.query(api.beta.access, {})).toEqual({ restricted: true, allowed: false });
   vi.stubEnv("NODE_ENV", "production");
   expect((await user.query(api.beta.access, {})).allowed).toBe(false);
   vi.stubEnv("BETA_ALLOWED_SUBJECTS", "synthetic-invited");

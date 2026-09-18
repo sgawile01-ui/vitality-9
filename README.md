@@ -23,6 +23,11 @@ On a managed Windows network, certificate validation may require the OS trust st
 
 ## Backend and authentication
 
+See [authentication gate](docs/AUTHENTICATION_GATE.md) for the current Hercules
+architecture, exact redirect requirements, test isolation and pending real-login
+verification. All backend runtimes now require explicit beta invitations;
+`BETA_MODE=local` does not bypass access checks.
+
 ```sh
 npm run convex:dev
 ```

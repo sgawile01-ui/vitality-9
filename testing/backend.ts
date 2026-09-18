@@ -1,6 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { assertLocalTestingRuntime } from "./isolation";
 const execute = promisify(execFile);
 const identity = {
   subject: "founder-testing",
@@ -22,6 +23,13 @@ export const allowed = new Set([
 let queue: Promise<unknown> = Promise.resolve();
 export function callLocal(name: string, args: unknown = {}, asUser = true): Promise<unknown> {
   const run = async () => {
+    assertLocalTestingRuntime();
+    // Reject a replaced selector before invoking any administrative CLI command.
+    if (
+      (await readFile(".convex/local-selector.env", "utf8")).trim() !==
+      "CONVEX_DEPLOYMENT=anonymous:anonymous-agent"
+    )
+      throw new Error("LOCAL_TESTING_ONLY");
     const command = [
       "node_modules/convex/bin/main.js",
       "run",
@@ -62,6 +70,7 @@ export function callLocal(name: string, args: unknown = {}, asUser = true): Prom
   return result;
 }
 export async function prepare() {
+  assertLocalTestingRuntime();
   await mkdir(".convex", { recursive: true });
   await writeFile(".convex/local-selector.env", "CONVEX_DEPLOYMENT=anonymous:anonymous-agent\n");
   try {

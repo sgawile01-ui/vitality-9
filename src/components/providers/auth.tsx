@@ -7,9 +7,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       client_id={import.meta.env.VITE_HERCULES_OIDC_CLIENT_ID!}
       userManagerSettings={{
         prompt: import.meta.env.VITE_HERCULES_OIDC_PROMPT ?? "select_account",
-        response_type: import.meta.env.VITE_HERCULES_OIDC_RESPONSE_TYPE ?? "code",
+        response_type: "code",
+        disablePKCE: false,
         scope: import.meta.env.VITE_HERCULES_OIDC_SCOPE ?? "openid profile email offline_access",
-        redirect_uri: import.meta.env.VITE_HERCULES_OIDC_REDIRECT_URI ?? `${window.location.origin}/auth/callback`,
+        redirect_uri: `${window.location.origin}/auth/callback`,
+        post_logout_redirect_uri: window.location.origin,
       }}
     >
       {children}

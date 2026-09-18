@@ -94,8 +94,12 @@ function ProfileInner() {
   };
 
   const handleSignOut = async () => {
-    await signout();
-    navigate("/");
+    try {
+      await signout();
+      navigate("/", { replace: true });
+    } catch {
+      toast.error("Provider sign-out could not be confirmed. Please try again.");
+    }
   };
 
   const handleUpgrade = async () => {

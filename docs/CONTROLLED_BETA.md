@@ -16,7 +16,7 @@ The build preflight reads process configuration only and rejects missing/placeho
 
 ## Invitation-only access
 
-Set `BETA_MODE` to `restricted` on production. Put only approved synthetic testers' exact OIDC subject identifiers in the private, comma-separated `BETA_ALLOWED_SUBJECTS` setting. An empty or absent list denies everyone; absent mode also restricts access. `BETA_MODE=local` is reserved for the anonymous local backend and must never be configured on production. The gate applies on the server to profiles, tasks, AI and checkout, including existing sessions. Removing a subject revokes access on subsequent requests.
+Put only approved test accounts' exact OIDC subject identifiers in the private, comma-separated `BETA_ALLOWED_SUBJECTS` setting. An empty or absent list denies everyone. All runtimes require invitations; the legacy `BETA_MODE` setting, including `local`, cannot bypass access checks. The gate applies on the server to profiles, tasks, AI and checkout, including existing sessions. Removing a subject revokes access on subsequent requests. See [authentication gate](AUTHENTICATION_GATE.md) for current verification requirements.
 
 Invitees can authenticate, but app data and functions stay unavailable until their subject is allowed. Do not use email text, a URL flag, or frontend state as authorization. The organizer must identify approved subjects using Hercules administration. No participant invitations have been sent.
 

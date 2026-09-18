@@ -11,7 +11,13 @@ export default function AuthCallback() {
   const { isAuthenticated: isConvexAuthenticated } = useConvexAuth();
   const updateCurrentUser = useMutation(api.users.updateCurrentUser);
   const onSync = useCallback(async () => {
-    await updateCurrentUser();
+    try {
+      const userId = await updateCurrentUser();
+      if (!userId) throw new Error("Session unavailable");
+    } catch {
+      // The provider hook logs sync errors. Never pass backend details to it.
+      throw new Error("Sign in could not be completed. Please try again.");
+    }
   }, [updateCurrentUser]);
   const navigateHome = useCallback(() => navigate("/", { replace: true }), [navigate]);
   const { status, error, retry } = useAuthCallback({
