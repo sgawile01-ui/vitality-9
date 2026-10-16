@@ -1,0 +1,9 @@
+node_modules
+dist
+convex/_generated
+package-lock.json
+test-results
+.convex
+.env*
+playwright-report
+coverage

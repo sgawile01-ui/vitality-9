@@ -1,3 +1,4 @@
+import { requireBetaAccess } from "./lib/betaAccess";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
@@ -7,6 +8,7 @@ export const updateCurrentUser = mutation({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
+    requireBetaAccess(identity);
 
     const existing = await ctx.db
       .query("users")
@@ -14,7 +16,7 @@ export const updateCurrentUser = mutation({
       .unique();
 
     if (existing) {
-      await ctx.db.patch(existing._id, { name: identity.name, email: identity.email });
+      await ctx.db.patch(existing._id, { email: identity.email });
       return existing._id;
     }
 
@@ -35,6 +37,7 @@ export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
+    requireBetaAccess(identity);
     return await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
@@ -47,11 +50,17 @@ export const updateProfile = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new ConvexError({ message: "Not authenticated", code: "UNAUTHENTICATED" });
+    requireBetaAccess(identity);
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier))
       .unique();
     if (!user) throw new ConvexError({ message: "User not found", code: "NOT_FOUND" });
-    await ctx.db.patch(user._id, { name: args.name });
+    if (!args.name.trim() || args.name.length > 100)
+      throw new ConvexError({
+        code: "INVALID_INPUT",
+        message: "Enter a name of 1 to 100 characters.",
+      });
+    await ctx.db.patch(user._id, { name: args.name.trim() });
   },
 });

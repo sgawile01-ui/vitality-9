@@ -13,9 +13,8 @@ http.route({
 
     try {
       await ctx.runAction(internal.stripeWebhook.handleStripeEvent, { body, sig });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Webhook error";
-      return new Response(message, { status: 400 });
+    } catch {
+      return new Response("Webhook unavailable", { status: 400 });
     }
 
     return new Response(JSON.stringify({ received: true }), {

@@ -10,17 +10,34 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const { isAuthenticated: isConvexAuthenticated } = useConvexAuth();
   const updateCurrentUser = useMutation(api.users.updateCurrentUser);
-  const onSync = useCallback(async () => { await updateCurrentUser(); }, [updateCurrentUser]);
+  const onSync = useCallback(async () => {
+    try {
+      const userId = await updateCurrentUser();
+      if (!userId) throw new Error("Session unavailable");
+    } catch {
+      // The provider hook logs sync errors. Never pass backend details to it.
+      throw new Error("Sign in could not be completed. Please try again.");
+    }
+  }, [updateCurrentUser]);
   const navigateHome = useCallback(() => navigate("/", { replace: true }), [navigate]);
-  const { status, error, retry } = useAuthCallback({ isBackendAuthenticated: isConvexAuthenticated, onSync, onSuccess: navigateHome, onNoAuthParams: navigateHome });
+  const { status, error, retry } = useAuthCallback({
+    isBackendAuthenticated: isConvexAuthenticated,
+    onSync,
+    onSuccess: navigateHome,
+    onNoAuthParams: navigateHome,
+  });
 
   if (status === "error" && error) {
     return (
       <div className="flex flex-col items-center justify-center h-svh gap-6 px-4">
         <p className="text-destructive font-medium">Something went wrong</p>
-        <p className="text-sm text-muted-foreground">{error}</p>
+        <p className="text-sm text-muted-foreground">
+          Sign in could not be completed. Please try again.
+        </p>
         <div className="flex gap-3">
-          <Button variant="secondary" onClick={navigateHome}>Return home</Button>
+          <Button variant="secondary" onClick={navigateHome}>
+            Return home
+          </Button>
           <Button onClick={retry}>Try again</Button>
         </div>
       </div>
